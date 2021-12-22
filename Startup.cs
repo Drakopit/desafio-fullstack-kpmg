@@ -1,3 +1,5 @@
+using desafio_fullstack.DataBase;
+using desafio_fullstack.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -16,6 +18,7 @@ namespace desafio_fullstack
 {
     public class Startup
     {
+        // TODO: Verificar a configuração
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -26,6 +29,10 @@ namespace desafio_fullstack
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<DbSession>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IGameResultRepository, GameResultRepository>();
+            services.AddTransient<ILeaderBoardRepository, LeaderBoardRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
