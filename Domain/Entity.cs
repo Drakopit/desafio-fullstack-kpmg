@@ -4,8 +4,11 @@ namespace desafio_fullstack.Domain
 {
     public class Entity
     {
-        public long Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public Entity() {}
+        public Entity()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }

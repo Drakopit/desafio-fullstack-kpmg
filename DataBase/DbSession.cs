@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MySqlConnector;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -14,7 +15,7 @@ namespace desafio_fullstack.DataBase
         public DbSession(IConfiguration configuration)
         {
             id = Guid.NewGuid();
-            Connection = new SqlConnection(configuration.GetConnectionString("Conexao"));
+            Connection = new MySqlConnection(configuration.GetConnectionString("Conexao"));
             Connection.Open();
         }
 

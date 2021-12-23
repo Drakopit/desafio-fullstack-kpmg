@@ -1,5 +1,6 @@
 using desafio_fullstack.DataBase;
 using desafio_fullstack.Repository;
+using desafio_fullstack.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,6 +34,12 @@ namespace desafio_fullstack
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IGameResultRepository, GameResultRepository>();
             services.AddTransient<ILeaderBoardRepository, LeaderBoardRepository>();
+            services.AddTransient<ISynchronizeService, SynchronizeService>();
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

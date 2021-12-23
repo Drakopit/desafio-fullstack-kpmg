@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using desafio_fullstack.DataBase;
 using desafio_fullstack.Domain;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,9 +17,12 @@ namespace desafio_fullstack.Repository
             _session = session;
         }
 
+        // TODO: melhorar esse código
         public async Task<IEnumerable<LeaderBoard>> GetAll()
         {
-            string sql = "";
+            // Load those that are already in the database
+            string sql = $"select `{nameof(LeaderBoard.PlayerId)}`, `{nameof(LeaderBoard.Balance)}`, " +
+                $"`{nameof(LeaderBoard.LastUpdateDate)}` from `servidor`.`{nameof(LeaderBoard)}`;";
 
             return await _session.Connection.QueryAsync<LeaderBoard>(sql, null, _session.Transaction);
         }
@@ -32,11 +36,19 @@ namespace desafio_fullstack.Repository
 
         public async Task Save(LeaderBoard entity)
         {
-            throw new NotImplementedException();
+            // TODO: Quando não há registro, é criado.
+            string sql = $"insert into `servidor`.`LeaderBoard` (`PlayerId`, `Balance`, `LastUpdateDate`) " +
+                $"(select `PlayerId`, SUM(`win`) as `Balance`, {DateTime.Now} as `LastUpdateDate` " +
+                $"from `world`.`teste` where `PlayerId` = {entity.PlayerId} Group by `PlayerId`);";
         }
 
         public async Task Update(LeaderBoard entity)
         {
+            string sql = $"select `{nameof(GameResult.PlayerId)}`, SUM(`{nameof(GameResult.Win)}`) " +
+            $"as Balance from `servidor`.`{nameof(GameResult)}` Group by `{nameof(GameResult.PlayerId)}`;";
+
+            await _session.Connection.QueryAsync<LeaderBoard>(sql, null, _session.Transaction);
+
             throw new NotImplementedException();
         }
 
