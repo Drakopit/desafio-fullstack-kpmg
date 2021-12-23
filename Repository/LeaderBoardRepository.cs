@@ -44,8 +44,15 @@ namespace desafio_fullstack.Repository
 
         public async Task Update(LeaderBoard entity)
         {
-            string sql = $"select `{nameof(GameResult.PlayerId)}`, SUM(`{nameof(GameResult.Win)}`) " +
-            $"as Balance from `servidor`.`{nameof(GameResult)}` Group by `{nameof(GameResult.PlayerId)}`;";
+            string sql = $"SET @player = 1; " +
+                $"SET SQL_SAFE_UPDATES = 0; " +
+                $"update `world`.`LeaderBoard`, " +
+                $"(select `PlayerId`, SUM(`PlayerId`) as `Balance`, {DateTime.Now} as `LastUpdateDate` " +
+                $"from `Servidor`.`GameResult` where `PlayerId` = {entity.Id} Group by `PlayerId`) as leaderBoardTemp " +
+                $"set `LeaderBoard`.`Balance` = leaderBoardTemp.`Balance` " +
+                $"and `LeaderBoard`.`LastUpdateDate` = leaderBoardTemp.`LastUpdateDate` " +
+                $"where `LeaderBoard`.`PlayerId` = {entity.Id}; " +
+                $"SET SQL_SAFE_UPDATES = 1; ";
 
             await _session.Connection.QueryAsync<LeaderBoard>(sql, null, _session.Transaction);
 
