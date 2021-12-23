@@ -6,7 +6,7 @@ namespace desafio_fullstack.Service
 {
     public interface ISynchronizeService
     {
-        Task SynchronizeData();
+        Task<IEnumerable<LeaderBoard>> SynchronizeData();
         Task SaveRedisData(GameResult gameResult);
     }
 }

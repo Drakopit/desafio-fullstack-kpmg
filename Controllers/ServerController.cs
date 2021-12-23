@@ -3,13 +3,11 @@ using desafio_fullstack.Repository;
 using desafio_fullstack.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace desafio_fullstack.Controllers
 {
@@ -36,31 +34,19 @@ namespace desafio_fullstack.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<LeaderBoard>>> Get()
         {
-            List<LeaderBoard> leaderBoard = new List<LeaderBoard>();
-
-            //using (var redisClient = new RedisClient())
-            //{
-            //    var redisResult = redisClient.GetAll<LeaderBoard>();
-            //    leaderBoard.AddRange(redisResult);
-            //}
-
-            await _synchronizeService.SynchronizeData();
-
-            var dataBaseResult = _leaderBoardRepository.GetAll();
-
             try
             {
-                // Mock
-                leaderBoard.Add(new LeaderBoard(0, 250, DateTime.Now));
-                leaderBoard.Add(new LeaderBoard(1, 320, DateTime.Now));
-                leaderBoard.Add(new LeaderBoard(2, 120, DateTime.Now));
-                leaderBoard.Add(new LeaderBoard(3, 530, DateTime.Now));
+                List<LeaderBoard> leaderBoard = new List<LeaderBoard>();
+                
+                var listLeaderBoardUpdate = await _synchronizeService.SynchronizeData();
+
+                leaderBoard.AddRange(listLeaderBoardUpdate);
+                return Ok(leaderBoard.OrderByDescending(x => x.Balance).ToList());
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            return Ok(leaderBoard.OrderByDescending(x => x.Balance).ToList());
         }
 
         [HttpPost("Synchronize")]
@@ -69,10 +55,8 @@ namespace desafio_fullstack.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ExecuteSynchronizeData()
         {
-            // Sincroniza os dados
             try
             {
-                // Em andamento
                 await _synchronizeService.SynchronizeData();
             }
             catch(Exception ex)

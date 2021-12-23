@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using desafio_fullstack.DataBase;
 using desafio_fullstack.Domain;
-using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,18 +19,23 @@ namespace desafio_fullstack.Repository
         // TODO: melhorar esse código
         public async Task<IEnumerable<LeaderBoard>> GetAll()
         {
-            // Load those that are already in the database
-            string sql = $"select `{nameof(LeaderBoard.PlayerId)}`, `{nameof(LeaderBoard.Balance)}`, " +
-                $"`{nameof(LeaderBoard.LastUpdateDate)}` from `servidor`.`{nameof(LeaderBoard)}`;";
+            try
+            {
+                // Load those that are already in the database
+                string sql = $"select `{nameof(LeaderBoard.Id)}`, `{nameof(LeaderBoard.PlayerId)}`, `{nameof(LeaderBoard.Balance)}`, " +
+                    $"`{nameof(LeaderBoard.LastUpdateDate)}` from `servidor`.`{nameof(LeaderBoard)}`;";
 
-            return await _session.Connection.QueryAsync<LeaderBoard>(sql, null, _session.Transaction);
+                return await _session.Connection.QueryAsync<LeaderBoard>(sql, null, _session.Transaction);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<LeaderBoard> GetById(long id)
         {
-            string sql = "";
-            
-            return await _session.Connection.QueryFirstAsync<LeaderBoard>(sql, null, _session.Transaction);
+            throw new NotImplementedException();
         }
 
         public async Task Save(LeaderBoard entity)
@@ -42,16 +46,16 @@ namespace desafio_fullstack.Repository
                 $"from `world`.`teste` where `PlayerId` = {entity.PlayerId} Group by `PlayerId`);";
         }
 
-        public async Task Update(LeaderBoard entity)
+        public async Task Update(long playerId)
         {
             string sql = $"SET @player = 1; " +
                 $"SET SQL_SAFE_UPDATES = 0; " +
                 $"update `world`.`LeaderBoard`, " +
                 $"(select `PlayerId`, SUM(`PlayerId`) as `Balance`, {DateTime.Now} as `LastUpdateDate` " +
-                $"from `Servidor`.`GameResult` where `PlayerId` = {entity.Id} Group by `PlayerId`) as leaderBoardTemp " +
+                $"from `Servidor`.`GameResult` where `PlayerId` = {playerId} Group by `PlayerId`) as leaderBoardTemp " +
                 $"set `LeaderBoard`.`Balance` = leaderBoardTemp.`Balance` " +
                 $"and `LeaderBoard`.`LastUpdateDate` = leaderBoardTemp.`LastUpdateDate` " +
-                $"where `LeaderBoard`.`PlayerId` = {entity.Id}; " +
+                $"where `LeaderBoard`.`PlayerId` = {playerId}; " +
                 $"SET SQL_SAFE_UPDATES = 1; ";
 
             await _session.Connection.QueryAsync<LeaderBoard>(sql, null, _session.Transaction);
@@ -60,6 +64,11 @@ namespace desafio_fullstack.Repository
         }
 
         public async Task Delete(LeaderBoard entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task Update(LeaderBoard entity)
         {
             throw new NotImplementedException();
         }
