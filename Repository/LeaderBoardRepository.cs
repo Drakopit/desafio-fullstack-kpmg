@@ -38,12 +38,28 @@ namespace desafio_fullstack.Repository
             throw new NotImplementedException();
         }
 
-        public async Task Save(LeaderBoard entity)
+        public async Task Save(long playerId)
         {
             // TODO: Quando não há registro, é criado.
             string sql = $"insert into `servidor`.`LeaderBoard` (`PlayerId`, `Balance`, `LastUpdateDate`) " +
                 $"(select `PlayerId`, SUM(`win`) as `Balance`, {DateTime.Now} as `LastUpdateDate` " +
-                $"from `world`.`teste` where `PlayerId` = {entity.PlayerId} Group by `PlayerId`);";
+                $"from `servidor`.`gameresult` where `PlayerId` = {playerId} Group by `PlayerId`);";
+        }
+
+        public async Task<bool> CheckIfExist(long playerId)
+        {
+            string sql = $"select * from `servidor`.`gameresult` where `PlayerId` = {playerId}";
+
+            var result = await _session.Connection.QueryAsync<GameResult>(sql, null, _session.Transaction);
+            return result == null ? false : true;
+        } 
+
+        public async Task UpdateBalanceLeaderBoard(long playerId)
+        {
+            if (await CheckIfExist(playerId) == false)
+                await Save(playerId);
+            else
+                await Update(playerId);
         }
 
         public async Task Update(long playerId)
@@ -69,6 +85,11 @@ namespace desafio_fullstack.Repository
         }
 
         public async Task Update(LeaderBoard entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task Save(LeaderBoard entity)
         {
             throw new NotImplementedException();
         }

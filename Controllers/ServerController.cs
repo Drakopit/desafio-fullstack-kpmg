@@ -15,16 +15,10 @@ namespace desafio_fullstack.Controllers
     [ApiController]
     public class ServerController : ControllerBase
     {
-        private readonly IGameResultRepository _gameResultRepository;
-        private readonly ILeaderBoardRepository _leaderBoardRepository;
         private readonly ISynchronizeService _synchronizeService;
 
-        public ServerController(IGameResultRepository gameResultRepository,
-                                ILeaderBoardRepository leaderBoardRepository,
-                                ISynchronizeService synchronizeService)
+        public ServerController(ISynchronizeService synchronizeService)
         {
-            _gameResultRepository = gameResultRepository;
-            _leaderBoardRepository = leaderBoardRepository;
             _synchronizeService = synchronizeService;
         }
 

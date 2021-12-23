@@ -39,7 +39,7 @@ namespace desafio_fullstack.Service
                 {
                     var gameResultTemp = redisClient.Get<GameResult>(gameResultsList[x]);
                     _gameResultRepository.Save(gameResultTemp);
-                    _leaderBoardRepository.Update(gameResultTemp.Id);
+                    _leaderBoardRepository.UpdateBalanceLeaderBoard(gameResultTemp.PlayerId);
                 }
                 //redisClient.FlushAll();
             }
